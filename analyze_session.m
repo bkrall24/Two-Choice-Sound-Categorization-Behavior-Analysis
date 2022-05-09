@@ -80,21 +80,20 @@ function session =  analyze_session(selpath)
             % that run. This iterates through each trial and pulls out
             % specific information for each
             for trial = 1:length(d)
-                
-                signalNames = fieldnames(d{1,trial}.Cue);
-                signalName = fieldnames(d{1,trial}.Cue.(signalNames{1}));
-                
-                % This code block adapts to my change in trial structure to
-                % include unmodulated noise trials. It assumes that the
-                % more common audio cue used is listed first and if that is
-                % not used, the stimulus is 0. This will likely need to be
-                % changed to adapt to changes in tosca settings. It was an
-                % attempt to account for difference that arise due to
-                % changes in how people label things within Tosca.
-                % Unfortunately it does not work correctly with PAV trials.
+                                
+                % This code is an attempt to extract the stimulus in a way
+                % that's a bit agnostic to the Tosca setup. I think its
+                % still not perfect. Notably, if you rename the cue in
+                % Tosca it won't work.
+                %   signalNames = fieldnames(d{1,trial}.Cue); Can be used
+                %   and replace Signal below with (signalNames{1}).
+                %   However, in dualspout pavlovian trials, this causes an
+                %   error because you pull out the timeout value instead of
+                %   the signal value.
                 try
-                    signalVar = fieldnames(d{1,trial}.Cue.(signalNames{1}).(signalName{1}));
-                    stimulus = d{1,trial}.Cue.(signalNames{1}).(signalName{1}).(signalVar{1});
+                    signalName = fieldnames(d{1,trial}.Cue.Signal);
+                    signalVar = fieldnames(d{1,trial}.Cue.Signal.(signalName{1}));
+                    stimulus = d{1,trial}.Cue.Signal.(signalName{1}).(signalVar{1});
                 catch
                     stimulus = 0;
                 end
