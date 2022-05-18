@@ -14,7 +14,9 @@ function curves = plot_psychometric_curves(name, bins, conditions)
     %       each trial for the different curves to be fit
     %
     % Outputs:
-    %   curves - N x M array of structs, output of fit_psychometric_curve
+    %   curves - N x M array of structs, output of fit_psychometric_curve,
+    %   N = number of bins, M = number of conditions. Struct is empty if no
+    %   trials fit the condition
 
     if isempty(bins)
         bins = name.sessionNum;
@@ -25,24 +27,20 @@ function curves = plot_psychometric_curves(name, bins, conditions)
 
     high_side = mode(name.target(name.stimulus == 32));
     colors = colororder;
+    colors = [colors; colors; colors; colors; colors];
     
     figure
-    for i = unique(bins)
-        conds = unique(conditions(bins == i));
+    b = unique(bins);
+    for i = 1:length(b)
+        conds = unique(conditions(bins == b(i)));
         nexttile
         for j = 1:length(conds)
             
-            trial_choice = (bins == i) & conditions == conds(j);            
-            [stim_groups, stimuli] = findgroups(name.stimulus(trial_choice));
-            lick = name.lick(1:4,trial_choice);    
-            lick_right = splitapply(@(x) sum(x([1,4],:), 'all')/sum(x, 'all'), lick, stim_groups);
+            trial_choice = (bins == b(i)) & conditions == conds(j);            
+            [xAxis, yData, ~] = generate_psych_data(name.lick(:, trial_choice), name.stimulus(trial_choice));
             
-            if high_side == 0
-                lick_right = 1 - lick_right;
-            end
-            
-            if sum(~isnan(lick_right)) > 3
-                psych = fit_psychometric_curve(stimuli(~isnan(lick_right)), lick_right(~isnan(lick_right)), true, colors(j,:));
+            if sum(~isnan(yData)) > 3
+                psych = fit_psychometric_curve(xAxis(~isnan(yData)), yData(~isnan(yData)), true, colors(j,:));
                 curves(i,j) = psych;
             end
                       

@@ -18,10 +18,13 @@ function psych = fit_psychometric_curve(xAxis, yData, toFig, color)
     %       plots
     %
     % Outputs:
+    %   psych- struct containing the following variables:
     %   ffit - matlab cfit object containing the fitted model, parameters
     %       and confidence intervals
     %   curve - n x 2 numerical array containing a smooth curve plotted
     %       over the xAxis range. n = length(xAxis)*50
+    %   xAxis - xAxis
+    %   yData - yData
     
     
     % If no arguments are passed to toFig or color, they are defaulted to

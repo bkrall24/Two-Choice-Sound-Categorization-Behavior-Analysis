@@ -55,6 +55,7 @@ function session =  analyze_session(selpath)
     session.sessionNum = [];
     session.LED = [];
     session.target = [];
+  
     
     % Iterates through each file in the session - there is 1 file for each
     % run

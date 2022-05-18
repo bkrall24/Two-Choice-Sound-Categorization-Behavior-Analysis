@@ -16,12 +16,12 @@ function pupil = analyze_pupil(selpath)
     %analyzed. If not, it initalizes the variables to be saved. 
     if isfile(filepath)
         load(filepath, 'pupil');
-        loadedSessions = unique(pupil.sessions);
+        loadedSessions = unique(pupil.sessionNum);
         disp(strcat("Loading data from ", filepath));
     else
         loadedSessions = 'nan';
         pupil.diameter = [];
-        pupil.sessions = [];         
+        pupil.sessionNum = [];         
         disp(strcat("No file exists, creating file ",filepath));
     end
     
@@ -52,8 +52,9 @@ function pupil = analyze_pupil(selpath)
         video_path = [f{1}, '\', f{2}, '\Behavior_videos\',f{4}, '\', extractSessions{currentDay}];
         t = analyze_session_pupil(video_path, tosca_path);
         disp(strcat("Session ",num2str(currentDay)));
-        pupil.sessionName = [pupil.sessions, t.sessionName];
+        pupil.sessionNum = [pupil.sessionNum, t.sessionNum];
         pupil.diameter = [pupil.diameter; t.diameter];
+        
      
        
     end

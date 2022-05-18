@@ -61,12 +61,12 @@ function animal = analyze_animal(selpath)
     % them based on the session number to ensure you're keeping things
     % chronological
     sessionNum = cellfun(@str2num, (regexp(cell2mat(filenames), '\d*', 'Match')));
-    [~,sortIdx] = sort(sessionNum,'ascend');
+    [ns,sortIdx] = sort(sessionNum,'ascend');
     filenames = filenames(sortIdx);
     
     % Determines which of those folders to analyze by comparing the list
     % from the folder to the list from the data file
-    extractSessions = filenames( ~ismember(sessionNum, loadedSessions));
+    extractSessions = filenames( ~ismember(ns, loadedSessions));
     
     
     % Iterates through each folder that has not been analyzed and pulls out

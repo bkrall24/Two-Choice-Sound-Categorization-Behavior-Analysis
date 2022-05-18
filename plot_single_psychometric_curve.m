@@ -1,8 +1,9 @@
-function plot_single_psychometric_curve(psych, color)
+function plot_single_psychometric_curve(psych, color, errorbars)
 
     if nargin == 1
         color = 'k';
-    end
+    end   
+            
     
     plot(psych.curve(:,1), psych.curve(:,2), 'color', color)
     hold on
@@ -17,5 +18,9 @@ function plot_single_psychometric_curve(psych, color)
     end
     yline(.5, ':');
     ylim([0 1])
+    
+    if nargin > 2
+        errorbar( psych.xAxis, psych.yData, errorbars(:,1)- psych.yData, errorbars(:,2)- psych.yData, 'LineStyle', 'None', 'color', color);
+    end
     
 end
