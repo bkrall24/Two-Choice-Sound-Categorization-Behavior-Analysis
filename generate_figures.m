@@ -10,10 +10,15 @@
 % Fig 1E: Example of reduction of reaction times over the course of
 % learning
 
-example_mouse = c124;
+% Fig 1F: Group averages of controls (124,125, 129) success rate from trial
+%   1 to 'expert' threshold, averaged
+
+example_mouse = analyze_animal('W:\Data\2AFC_Behavior\c_124');
 sig = 500;
+control = get_animal_array;
+%%
 figure
-subplot(3,3,1:3)
+subplot(4,3,1:3)
 [x,y] = get_performance_trajectory(example_mouse, 'easy', sig);
 plot(x(sig:end),y(sig:end),'b')
 hold on
@@ -32,7 +37,7 @@ xlabel('Trials')
 text(length(example_mouse.sessionNum)-200, 0.625, 'Easy', 'color', 'b', 'HorizontalAlignment', 'right')
 text(length(example_mouse.sessionNum)-200, 0.55, 'Hard', 'color', 'r', 'HorizontalAlignment', 'right')
 
-subplot(3,3,4)
+subplot(4,3,4)
 [xAxis, yData, errorbars] = generate_psych_data( ...
     example_mouse.lick(:,example_mouse.sessionNum == 12), ...
     example_mouse.stimulus(example_mouse.sessionNum == 12));
@@ -42,7 +47,7 @@ ylabel('Proportion Lick Right')
 xlabel('Frequency (Hz)')
 title('Early ')
 
-subplot(3,3,5)
+subplot(4,3,5)
 [xAxis, yData, errorbars] = generate_psych_data( ...
     example_mouse.lick(:,example_mouse.sessionNum == 17), ...
     example_mouse.stimulus(example_mouse.sessionNum == 17));
@@ -52,7 +57,7 @@ ylabel('Proportion Lick Right')
 xlabel('Frequency (Hz)')
 title('Mid ')
 
-subplot(3,3,6)
+subplot(4,3,6)
 [xAxis, yData, errorbars] = generate_psych_data( ...
     example_mouse.lick(:,example_mouse.sessionNum == 22), ...
     example_mouse.stimulus(example_mouse.sessionNum == 22));
@@ -62,7 +67,7 @@ ylabel('Proportion Lick Right')
 xlabel('Frequency (Hz)')
 title('Late ')
 
-subplot(3,3,7:9)
+subplot(4,3,7:9)
 trial_reference = 1:length(example_mouse.stimulus);
 go = example_mouse.rxnTime > 500;
 easy = example_mouse.stimulus == 2 | example_mouse.stimulus == 2.828427 | example_mouse.stimulus == 22.627417 | example_mouse.stimulus == 32;
@@ -86,6 +91,31 @@ ylim([200 450])
 xlim([start length(example_mouse.sessionNum)])
 
 
+subplot(4,3,10:12)
+hold on
+for i = 1:length(control)
+    t = analyze_training(control(i));
+    
+    choose_training_period = false(length(control(i).stimulus),1);
+    choose_training_period(1:t.trials_expert) = true;
+    animal = select_trials(control(i), choose_training_period);
+    
+    [d_x, d_y] = get_performance_trajectory(animal, "easy", sig);
+    %x = d_x(sig:end) ./ d_x(end);
+    %norm_y(i,:) = interp1(x, d_y(sig:end), 0:0.005:1);
+    plot(sig:length(d_y), d_y(sig:end), 'color', [0 0 1 0.2])
+    hold on
+    norm_y(i,:) = d_y(sig:2600);
+        
+end
+
+shadedErrorBar(sig:2600, nanmean(norm_y), sem(norm_y), 'b', 1)
+yline(0.85, ':')
+xlabel('Trials')
+ylabel('Success Rate')
+xlim([sig,3000])
+ylim([0.5, 1])
+text(550, 0.9, 'Easy', 'color', 'b', 'HorizontalAlignment', 'left')
 set(gcf,'renderer','painter','color',[1 1 1]);
 
 %% Fig 2: 
@@ -96,7 +126,7 @@ set(gcf,'renderer','painter','color',[1 1 1]);
 % Fig 2A: Schematic of LED setup
 % Fig 2B: 
 
-control = get_animal_array;
+
 CAMKII = get_animal_array;
 PT = get_animal_array;
 IT = get_animal_array;

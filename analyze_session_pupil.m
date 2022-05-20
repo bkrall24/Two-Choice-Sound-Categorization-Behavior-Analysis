@@ -55,21 +55,22 @@ function pupil = analyze_session_pupil(video_path, tosca_path)
                         pupil.sessionNum = [pupil.sessionNum, str2num(f{end})];
                     end
                 catch
-                    error(strcat("Unable to get log or read_run for ",targetFiles{analyzeNum}));
+                    warning(strcat("Unable to get log or read_run for ",targetFiles{analyzeNum}));
+                    log.trials = [];
                 end
                         
             end
         end
 
         for t = 1:length(log.trials)
-            
+            [~,run_name,~] = fileparts(targetFiles{analyzeNum});
             % Determine the name to earch for the DLC file for the given trial  
             try
                 video_file = log.trials{1,t}.aviFile;
                 [filepath,name,~] = fileparts(video_file);
             catch
                 try
-                    [~,run_name,~] = fileparts(targetFiles{analyzeNum});
+                    
                     if t < 10
                         trial_name = strcat('.00',num2str(t));
                     elseif t < 100
@@ -88,7 +89,11 @@ function pupil = analyze_session_pupil(video_path, tosca_path)
             
             
             dlc_files = dir2(filepath, '.csv', strcat(name, '*'), '/s');
-            choose_filtered = cellfun(@contains, dlc_files, repmat({'filtered'}, size(dlc_files)));
+            if ~isempty(dlc_files)
+                choose_filtered = cellfun(@contains, dlc_files, repmat({'filtered'}, size(dlc_files)));
+            else 
+                choose_filtered = [];
+            end
 
             if sum(choose_filtered) < 1
                 warning(strcat("No filtered DLC files for ",name))     

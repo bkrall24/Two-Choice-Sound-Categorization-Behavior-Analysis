@@ -1,4 +1,4 @@
-function [x,y] = get_performance_trajectory(name, stimuli, sig, choice)
+function [x,y] = get_performance_trajectory(name, stimuli, sig,  content, choice)
     
     % Rebecca Krall
     %
@@ -11,12 +11,19 @@ function [x,y] = get_performance_trajectory(name, stimuli, sig, choice)
     %       'psych')
     %   sig - number, default is 200, number of trials over which to
     %       calculate the success rate
+    %   content - string, indicates what you're calculated. Default is
+    %       'hits' - i.e. success rate
+    %       'right' - bias rate
+    %       'no go' 
     
     if nargin < 3
         sig = 200;
     end
-    if nargin < 4
+    if nargin < 5
         choice = true(size(name.stimulus));
+    end
+    if nargin < 4
+        content = 'hits';
     end
     
     trial_reference = 1:length(name.stimulus);
@@ -40,8 +47,13 @@ function [x,y] = get_performance_trajectory(name, stimuli, sig, choice)
     go = name.lick(1,:) | name.lick(2,:)| name.lick(3,:) | name.lick(4,:);
     x = trial_reference(choose & choice & go); 
     
-    
-    hits = name.lick(1, choice & choose & go) | name.lick(2, choice & choose & go);  
+    if content == "hits"
+        hits = name.lick(1, choice & choose & go) | name.lick(2, choice & choose & go); 
+    elseif content == "right"
+        hits = name.lick(1, choice & choose & go) | name.lick(4, choice & choose & go); 
+    elseif content == "no go"
+        hits = name.lick(5, choice & choose & go) ;
+    end
     
     y = movsum(hits, [sig, 0])./sig;
 
