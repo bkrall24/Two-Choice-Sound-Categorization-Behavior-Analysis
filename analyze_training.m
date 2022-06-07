@@ -1,4 +1,4 @@
-function training = analyze_training(name)
+function training = analyze_training(name, save_choice)
 
     % Rebecca Krall
     %
@@ -53,7 +53,7 @@ function training = analyze_training(name)
     
     % This is a new expert threshold. Its when the animal passes 85% on all
     % hard, discriminable trials (i.e. not easy and not category boundary)
-    training.trials_expert = get_trial_number_at_threshold(name, 0.85, dualspout & ~(name.LED) & discrim & ~easy);
+    training.trials_expert = get_trial_number_at_threshold(name, 0.75, dualspout & ~(name.LED) & discrim & ~easy);
     training.days_expert = name.sessionNum(training.trials_expert);
     
    
@@ -76,6 +76,14 @@ function training = analyze_training(name)
     training.hard_x = trial_ref(select_hard);
     training.hard_trajectory = movsum(hits_hard, [200, 0])./200;
     
-    
+    if nargin > 1
+        if save_choice
+            startPath = 'W:\Data\2AFC_Behavior';
+            selpath = uigetdir(startPath);
+            f = split(selpath, ["\"]);
+            filepath = [selpath,'\','analyze_training_',f{end},'.mat'];
+            save(filepath, 'training')
+        end
+    end
 
 end

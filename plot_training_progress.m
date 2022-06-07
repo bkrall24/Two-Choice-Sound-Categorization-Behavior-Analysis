@@ -112,13 +112,13 @@ function plot_training_progress(name, sig, LED)
             
             
             subplot(4,1,1)
-            [x,y] = get_performance_trajectory(name, 'easy', sig, choose);
+            [x,y] = get_performance_trajectory(name, 'easy', sig, 'hits', choose);
             plot(x(sig:end),y(sig:end),'b')
             hold on
-            [x,y] = get_performance_trajectory(name, 'hard', sig, choose);
+            [x,y] = get_performance_trajectory(name, 'hard', sig, 'hits', choose);
             plot(x(sig:end),y(sig:end),'r')
             hold on
-            [x,y] = get_performance_trajectory(name, 'discriminable', sig, choose);
+            [x,y] = get_performance_trajectory(name, 'discriminable', sig, 'hits', choose);
             plot(x(sig:end),y(sig:end),'k')
             plot(diff(name.sessionNum), ':', 'color', [0.5 0.5 0.5])
             xlim([0 length(name.sessionNum)])
@@ -133,10 +133,10 @@ function plot_training_progress(name, sig, LED)
 
 
             subplot(4,1,2)
-            [x,y] = get_performance_trajectory(name, 'low', sig, choose);
+            [x,y] = get_performance_trajectory(name, 'low', sig, 'hits', choose);
             plot(x(sig:end),y(sig:end),'b')
             hold on
-            [x,y] = get_performance_trajectory(name, 'high', sig, choose);
+            [x,y] = get_performance_trajectory(name, 'high', sig, 'hits', choose);
             plot(x(sig:end),y(sig:end),'r')
             hold on
             plot(diff(name.sessionNum), ':', 'color', [0.5 0.5 0.5])
