@@ -9,7 +9,7 @@ function pupil = analyze_pupil(selpath)
     
     %Make a new filename using the name of the directory you select
     f = split(selpath, ["\"]);
-    filepath = [selpath,'\','pupil_',f{end},'.mat'];
+    filepath = [selpath,'\','pupil_baseline',f{end},'.mat'];
     
     %Checks to see if file was already generated, if so, it loads the
     %data as well as identifying which sessions have already been
@@ -50,7 +50,7 @@ function pupil = analyze_pupil(selpath)
        
         tosca_path = [selpath, '\', extractSessions{currentDay}];
         video_path = [f{1}, '\', f{2}, '\Behavior_videos\',f{4}, '\', extractSessions{currentDay}];
-        t = analyze_session_pupil(video_path, tosca_path);
+        t = analyze_session_pupil_baseline(video_path, tosca_path);
         disp(strcat("Session ",num2str(currentDay)));
         pupil.sessionNum = [pupil.sessionNum, t.sessionNum];
         pupil.diameter = [pupil.diameter; t.diameter];

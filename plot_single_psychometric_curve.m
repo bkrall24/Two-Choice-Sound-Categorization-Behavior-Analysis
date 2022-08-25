@@ -7,7 +7,7 @@ function plot_single_psychometric_curve(psych, color, errorbars)
     
     plot(psych.curve(:,1), psych.curve(:,2), 'color', color)
     hold on
-    scatter(psych.xAxis, psych.yData, 'MarkerEdgeColor', color);
+    %scatter(psych.xAxis, psych.yData, 'MarkerEdgeColor', color);
 
     set(gca, 'XScale', 'log')
     axis square

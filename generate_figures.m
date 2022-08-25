@@ -166,13 +166,13 @@ control = get_animal_array;
 for i = 1:length(CAMKII)
     tc = analyze_training(CAMKII(i));
     choose = false(1,length(CAMKII(i).stimulus));
-    choose(tc.trials_expert: tc.trials_expert +2000) = true;    
+    choose(tc.trials_expert: tc.trials_expert +1000) = true;    
     cmk2(i) = select_trials(CAMKII(i), choose);
 end
 for i = 1:length(control)
     tc = analyze_training(control(i));
     choose = false(1,length(control(i).stimulus));
-    choose(tc.trials_expert: tc.trials_expert +2000) = true;    
+    choose(tc.trials_expert: tc.trials_expert +1000) = true;    
     ctl(i) = select_trials(control(i), choose);
 end
 %%
@@ -190,40 +190,43 @@ end
 %% Performance with and without LED
 subplot(1,3,1)
 plotDataPointsError(squeeze(h(:,1,:)),3:4, [0 0 0], true, false)
-plotDataPointsError(squeeze(b(:,1,:))', 1:2, [0 0 0], true, false)
+plotDataPointsError(squeeze(b(:,1,:)), 1:2, [0 0 0], true, false)
 title('Low Trials')
 ylabel('Percent Correct')
+ylim([0 1])
 subplot(1,3,2)
 plotDataPointsError(squeeze(h(:,2,:)), 3:4, [0 0 0], true, false)
-plotDataPointsError(squeeze(b(:,2,:))',1:2, [0 0 0], true, false)
+plotDataPointsError(squeeze(b(:,2,:)),1:2, [0 0 0], true, false)
 title('High Trials')
 ylabel('Percent Correct')
+ylim([0 1])
 subplot(1,3,3)
 plotDataPointsError(squeeze(h(:,3,:)), 3:4, [0 0 0], true, false)
-plotDataPointsError(squeeze(b(:,3,:))', 1:2, [0 0 0], true, false)
+plotDataPointsError(squeeze(b(:,3,:)), 1:2, [0 0 0], true, false)
 title('Indiscriminable Trials')
 ylabel('Percent Correct')
+ylim([0 1])
 
 %% Example psychometric curve
-c = 1
+c = 2
 led = logical(cmk2(c).LED);
 subplot(1,2,2)
-[xAxis, yData, errorbars] = generate_psych_data(cmk2(c).lick(:,~led), cmk2(c).stimulus(~led));
+[xAxis, yData, errorbars] = generate_psych_data(cmk2(c).lick(:,~led), cmk2(c).stimulus(~led), 0);
 psych = fit_psychometric_curve(xAxis, yData, false, 'k');
 plot_single_psychometric_curve(psych, 'k', errorbars);
 
-[xAxis, yData, errorbars] = generate_psych_data(cmk2(c).lick(:,led), cmk2(c).stimulus(led));
+[xAxis, yData, errorbars] = generate_psych_data(cmk2(c).lick(:,led), cmk2(c).stimulus(led), 0);
 psych = fit_psychometric_curve(xAxis, yData, false, 'k');
 plot_single_psychometric_curve(psych, 'b', errorbars);
 
-c = 1
+c = 3
 subplot(1,2,1)
 led = logical(ctl(c).LED);
-[xAxis, yData, errorbars] = generate_psych_data(ctl(c).lick(:,~led), ctl(c).stimulus(~led));
+[xAxis, yData, errorbars] = generate_psych_data(ctl(c).lick(:,~led), ctl(c).stimulus(~led),0);
 psych = fit_psychometric_curve(xAxis, yData, false, 'k');
 plot_single_psychometric_curve(psych, 'k', errorbars);
 
-[xAxis, yData, errorbars] = generate_psych_data(ctl(c).lick(:,led), ctl(c).stimulus(led));
+[xAxis, yData, errorbars] = generate_psych_data(ctl(c).lick(:,led), ctl(c).stimulus(led),0);
 psych = fit_psychometric_curve(xAxis, yData, false, 'k');
 plot_single_psychometric_curve(psych, 'b', errorbars);
 
@@ -232,14 +235,15 @@ plot_single_psychometric_curve(psych, 'b', errorbars);
 
 for i = 1:length(cmk2)
     led = logical(cmk2(i).LED);
-    [xAxis, yData, errorbars] = generate_psych_data(cmk2(i).lick(:,~led), cmk2(i).stimulus(~led));
+    highSide = mode(cmk2(i).target(cmk2(i).stimulus == 2));
+    [xAxis, yData, errorbars] = generate_psych_data(cmk2(i).lick(:,~led), cmk2(i).stimulus(~led), highSide);
     psych = fit_psychometric_curve(xAxis, yData, false, 'k');
     ll(i,1) = psych.fit.low_lapse;
     hl(i,1) = psych.fit.high_lapse;
     bi(i,1) = psych.fit.bias;
     thr(i,1) = psych.fit.threshold;
     
-    [xAxis, yData, errorbars] = generate_psych_data(cmk2(i).lick(:,led), cmk2(i).stimulus(led));
+    [xAxis, yData, errorbars] = generate_psych_data(cmk2(i).lick(:,led), cmk2(i).stimulus(led), highSide);
     psych = fit_psychometric_curve(xAxis, yData, false, 'k');
     ll(i,2) = psych.fit.low_lapse;
     hl(i,2) = psych.fit.high_lapse;
@@ -249,14 +253,15 @@ end
 
 for i = 1:length(ctl)
     led = logical(ctl(i).LED);
-    [xAxis, yData, errorbars] = generate_psych_data(ctl(i).lick(:,~led), ctl(i).stimulus(~led));
+    highSide = mode(ctl(i).target(ctl(i).stimulus == 2));
+    [xAxis, yData, errorbars] = generate_psych_data(ctl(i).lick(:,~led), ctl(i).stimulus(~led), highSide);
     psych = fit_psychometric_curve(xAxis, yData, false, 'k');
     ll2(i,1) = psych.fit.low_lapse;
     hl2(i,1) = psych.fit.high_lapse;
     b2(i,1) = psych.fit.bias;
     thr2(i,1) = psych.fit.threshold;
     
-    [xAxis, yData, errorbars] = generate_psych_data(ctl(i).lick(:,led), ctl(i).stimulus(led));
+    [xAxis, yData, errorbars] = generate_psych_data(ctl(i).lick(:,led), ctl(i).stimulus(led), highSide);
     psych = fit_psychometric_curve(xAxis, yData, false, 'k');
     ll2(i,2) = psych.fit.low_lapse;
     hl2(i,2) = psych.fit.high_lapse;
@@ -305,7 +310,7 @@ axis square
 %% Plot bias
 for i = 1:length(cmk2)
     led = logical(cmk2(i).LED);
-    if mode(cmk2(i).target(cmk2(i).stimulus == 32))
+    if mode(cmk2(i).target(cmk2(i).stimulus == 32)) == 1
         bias(i,1) = (sum(cmk2(i).lick([2,3],~led), 'all') - sum(cmk2(i).lick([1,4],~led), 'all')) / sum(cmk2(i).lick([1:4],~led), 'all');
         bias(i,2) = (sum(cmk2(i).lick([2,3],led), 'all') - sum(cmk2(i).lick([1,4],led), 'all')) / sum(cmk2(i).lick([1:4],led), 'all');
     else
@@ -316,7 +321,7 @@ end
 
 for i = 1:length(ctl)
     led = logical(ctl(i).LED);
-    if mode(ctl(i).target(cmk2(i).stimulus == 32))
+    if mode(ctl(i).target(cmk2(i).stimulus == 32)) == 1
         bias2(i,1) = (sum(ctl(i).lick([2,3],~led), 'all') - sum(ctl(i).lick([1,4],~led), 'all')) / sum(ctl(i).lick([1:4],~led), 'all');
         bias2(i,2) = (sum(ctl(i).lick([2,3],led), 'all') - sum(ctl(i).lick([1,4],led), 'all')) / sum(ctl(i).lick([1:4],led), 'all');
     else
@@ -376,7 +381,7 @@ xticklabels({'Control', 'CAMKII'})
 % at expert level
 % plot all the opto -> expert trajectories on non-normalized axes
 % sessions and trials to reach thresholds
-num_groups = 5;
+num_groups = 2;
 for i = 1:num_groups
     group = get_animal_array;
     
@@ -394,16 +399,19 @@ for i = 1:num_groups
         choose3(tc.trials_opto: tc.trials_proficient) = true; 
         animal3(j) = select_trials(group(j), choose3);
         train(j) = tc;
+        first_psy(j,:) = find(group(j).stimulus == 8, 10, 'first')
     end
     groups{i} = animal;
     traj{i} = animal2;
     training{i} = train;
     toprof{i} = animal3;
+    fp{i} = first_psy;
     clear animal3
     clear animal
     clear animal2
     clear train
-    
+    clear first_psy
+   
 end
 
 
@@ -425,7 +433,7 @@ for i = 1:length(perf)
     ylabel('Percent Correct')
     title(names{i})
     xlim([0.75 2.25])
-    ylim([0.45 0.90])
+    ylim([0.45 1])
 end
 
 %%
@@ -477,6 +485,7 @@ xlim([200 7000])
 ylim([0.4 1.01])
     
 %%
+figure
 subplot(1,4,1)
 for i = 1:length(training)
     scatter(i * ones(1, length(training{i})), [training{i}.trials_proficient], 'MarkerEdgeColor', colors(i,1:3), 'MarkerEdgeAlpha', 0.2)
@@ -486,6 +495,12 @@ for i = 1:length(training)
     end
     
 end
+title('Trials Proficient')
+xticks([1:5])
+xticklabels(names)
+xtickangle(45)
+axis square
+axis padded
 
 subplot(1,4,2)
 for i = 1:length(training)
@@ -496,6 +511,12 @@ for i = 1:length(training)
     end
     hold on
 end
+title('Sessions Proficient')
+xticks([1:5])
+xticklabels(names)
+xtickangle(45)
+axis square
+axis padded
 
 subplot(1,4,3)
 for i = 1:length(training)
@@ -506,6 +527,12 @@ for i = 1:length(training)
     end
     hold on
 end
+title('Trials Expert')
+xticks([1:5])
+xticklabels(names)
+xtickangle(45)
+axis square
+axis padded
 
 subplot(1,4,4)
 for i = 1:length(training)
@@ -516,11 +543,91 @@ for i = 1:length(training)
     end
     hold on
 end
+title('Sessions Expert')
+xticks([1:5])
+xticklabels(names)
+xtickangle(45)
+axis square
+axis padded
+
+
+%% 
+% consider looking at the number of hard trials exist in the range  
+figure
+subplot(1,4,1)
+for i = 1:length(training)
+    scatter(i * ones(1, length(training{i})), [training{i}.trials_expert] - median(fp{1,i}'), 'MarkerEdgeColor', colors(i,1:3), 'MarkerEdgeAlpha', 0.2)
+    hold on
+    if length(training{i}) > 1
+        errorbar(i, nanmean([training{i}.trials_expert] - median(fp{1,i}')), sem(([training{i}.trials_expert] - median(fp{1,i}'))'), 'Marker', 'o', 'color', colors(i,1:3))
+    end
+    hold on
+end
+title('Expert - first psych')
+xticks([1:5])
+xticklabels(names)
+xtickangle(45)
+axis square
+axis padded
+
+
+subplot(1,4,2)
+for i = 1:length(training)
+    scatter(i * ones(1, length(training{i})),  median(fp{1,i}'), 'MarkerEdgeColor', colors(i,1:3), 'MarkerEdgeAlpha', 0.2)
+    hold on
+    if length(training{i}) > 1
+        errorbar(i, nanmean(median(fp{1,i}')), sem(( median(fp{1,i}'))'), 'Marker', 'o', 'color', colors(i,1:3))
+    end
+    hold on
+end
+title('Trials till first Psych')
+xticks([1:5])
+xticklabels(names)
+xtickangle(45)
+axis square
+axis padded
+
+
+subplot(1,4,3)
+for i = 1:length(training)
+   scatter(i * ones(1, length(training{i})), median(fp{1,i}')- [training{i}.trials_proficient], 'MarkerEdgeColor', colors(i,1:3), 'MarkerEdgeAlpha', 0.2)
+    hold on
+    if length(training{i}) > 1
+        errorbar(i, nanmean( median(fp{1,i}')- [training{i}.trials_proficient]), sem(( median(fp{1,i}')- [training{i}.trials_proficient])'), 'Marker', 'o', 'color', colors(i,1:3))
+    end
+    hold on
+end
+title('First Psych - Proficient')
+xticks([1:5])
+xticklabels(names)
+xtickangle(45)
+axis square
+axis padded
+
+
+subplot(1,4,4)
+for i = 1:length(training)
+   scatter(i * ones(1, length(training{i})), [training{i}.trials_expert]- [training{i}.trials_proficient], 'MarkerEdgeColor', colors(i,1:3), 'MarkerEdgeAlpha', 0.2)
+    hold on
+    if length(training{i}) > 1
+        errorbar(i, nanmean( [training{i}.trials_expert]- [training{i}.trials_proficient]), sem(([training{i}.trials_expert]- [training{i}.trials_proficient])'), 'Marker', 'o', 'color', colors(i,1:3))
+    end
+    hold on
+end
+title('Expert - Proficient')
+xticks([1:5])
+xticklabels(names)
+xtickangle(45)
+axis square
+axis padded
+
+
+
 
 
 %% Max performance
 
-num_groups = 3;
+num_groups = 2;
 for i = 1:num_groups
     group = get_animal_array;
     
@@ -535,6 +642,7 @@ for i = 1:num_groups
         choose2 = false(1,length(group(j).stimulus));
         choose2(tc.trials_expert: length(group(j).stimulus)) = true; 
         animal2(j) = select_trials(group(j), choose2);
+        
 
     end
     proficient{i} = animal;
@@ -550,29 +658,42 @@ for i = 1:length(proficient)
     pa = proficient{i}
     for j = 1:length(pa)
         choose_trials = pa(j).stimulus < 4 | pa(j).stimulus > 16;
-        a = select_trials(pa(j),  choose_trials)
-        perf{i,j} = splitapply(@(x) sum(x([1,2],:), 'all')./sum(x(1:4,:), 'all'), a.lick, a.sessionNum - min(a.sessionNum)+1)
+        led = pa(j).LED
+        a = select_trials(pa(j),  choose_trials & ~led)
+        ses = unique(a.sessionNum);
+        from = ses;
+        to = 1:length(ses);
+        bins = changem(a.sessionNum, to, from);
+        %perf{i,j} = splitapply(@(x) sum(x([1,2],:), 'all')./sum(x(1:4,:), 'all'), a.lick, a.sessionNum - min(a.sessionNum)+1)
+        perf{i,j} = splitapply(@(x) sum(x([1,2],:), 'all')./sum(x(1:4,:), 'all'), a.lick,bins)
     end
 end
 
 p1 = cellfun(@nanmean, perf)
 v1 = cellfun(@var, perf)
 
-
+%%
 for i = 1:length(expert)
     pa = expert{i}
     for j = 1:length(pa)
-        choose_trials = pa(j).stimulus >= 4 | pa(j).stimulus <= 16;
-        a = select_trials(pa(j),  choose_trials)
-        perf{i,j} = splitapply(@(x) sum(x([1,2],:), 'all')./sum(x(1:4,:), 'all'), a.lick, a.sessionNum - min(a.sessionNum)+1)
+        choose_trials = pa(j).stimulus >= 4 & pa(j).stimulus <= 16 & pa(j).stimulus ~= 8;
+        led = pa(j).LED
+        a = select_trials(pa(j),  ~choose_trials & ~led)
+        ses = unique(a.sessionNum);
+           from = ses;
+        to = 1:length(ses);
+        bins = changem(a.sessionNum, to, from);
+        %perf{i,j} = splitapply(@(x) sum(x([1,2],:), 'all')./sum(x(1:4,:), 'all'), a.lick, a.sessionNum - min(a.sessionNum)+1)
+        perf{i,j} = splitapply(@(x) sum(x([1,2],:), 'all')./sum(x(1:4,:), 'all'), a.lick, bins)
     end
 end
 
-p2 = cellfun(@nanmean, perf)
-v2 = cellfun(@var, perf)
+p2 = cellfun(@nanmean, perf);
+v2 = cellfun(@var, perf);
 
 
 %%
+figure
 subplot(2,2,1)
 errorbar(nanmean(p1,2), sem(p1'), 'ok')
 hold on
@@ -582,6 +703,7 @@ end
 xticks(1:length(proficient))
 xticklabels(names)
 axis padded
+ylim([0.8 1])
 
 subplot(2,2,2)
 errorbar(nanmean(v1,2), sem(v1'), 'ok')
@@ -602,7 +724,7 @@ end
 xticks(1:length(proficient))
 xticklabels(names)
 axis padded
-
+ylim([0.6 1])
 subplot(2,2,4)
 errorbar(nanmean(v2,2), sem(v2'), 'ok')
 hold on
@@ -612,3 +734,12 @@ end
 xticks(1:length(proficient))
 xticklabels(names)
 axis padded
+
+
+
+%%
+training_block = nan(6,5);
+for i = 1:length(training)
+    tp = [training{i}.trials_expert];
+    training_block(1:length(tp),i)  = tp;
+end

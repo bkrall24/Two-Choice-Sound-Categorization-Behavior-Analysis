@@ -9,7 +9,7 @@ function trial_info = analyze_trial_info(selpath)
     
     %Make a new filename using the name of the directory you select
     f = split(selpath, ["\"]);
-    filepath = [selpath,'\','trial_info_',f{end},'.mat'];
+    filepath = [selpath,'\','ttl_info_',f{end},'.mat'];
     
     %Checks to see if file was already generated, if so, it loads the
     %data as well as identifying which sessions have already been
@@ -21,10 +21,8 @@ function trial_info = analyze_trial_info(selpath)
     else
         loadedSessions = 'nan';
               
-        trial_info.lick1 = [];
-        trial_info.lick2 = [];
-        trial_info.h2o1 = [];
-        trial_info.h2o2 = [];
+        trial_info.lick = [];
+        trial_info.h2o = [];
         trial_info.sessions = [];
         trial_info.good_trials = [];
          
@@ -62,10 +60,10 @@ function trial_info = analyze_trial_info(selpath)
         t = analyze_session_trial_info(inputPath);
         
         trial_info.sessions = [trial_info.sessions, t.sessions];
-        trial_info.lick1 = [trial_info.lick1; t.lick1];
-        trial_info.lick2 = [trial_info.lick2; t.lick2];
-        trial_info.h2o1 = [trial_info.h2o1; t.h2o1];
-        trial_info.h2o2 = [trial_info.h2o2; t.h2o2];
+        l = cat(3, t.lick1, t.lick2);
+        trial_info.lick = cat(1, trial_info.lick, l);
+        h = cat(3, t.h2o1, t.h2o2);
+        trial_info.h2o = cat(1, trial_info.h2o, h);
         trial_info.good_trials = [trial_info.good_trials, t.good_trials];
     end
    

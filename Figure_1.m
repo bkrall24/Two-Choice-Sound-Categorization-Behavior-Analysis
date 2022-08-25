@@ -3,6 +3,7 @@
 %% Example data
 example_mouse = analyze_animal('W:\Data\2AFC_Behavior\c_124');
 t = analyze_training(example_mouse);
+highSide = mode(example_mouse.target(example_mouse.stimulus == 2));
 sig = 500;
 
 %% Plot Training Trajectory of Easy and Hard stimuli trials
@@ -38,7 +39,7 @@ lastInd = find(example_mouse.sessionNum == 12, 1, 'last');
 
 [xAxis, yData, errorbars] = generate_psych_data( ...
     example_mouse.lick(:,lastInd -sig:lastInd), ...
-    example_mouse.stimulus(lastInd -sig:lastInd));
+    example_mouse.stimulus(lastInd -sig:lastInd), highSide);
 psych = fit_psychometric_curve(xAxis, yData, false);
 plot_single_psychometric_curve(psych, 'k', errorbars)
 ylabel('Proportion Lick Right')
@@ -58,7 +59,7 @@ lastInd = find(example_mouse.sessionNum == 17, 1, 'last');
 
 [xAxis, yData, errorbars] = generate_psych_data( ...
     example_mouse.lick(:,lastInd -sig:lastInd), ...
-    example_mouse.stimulus(lastInd -sig:lastInd));
+    example_mouse.stimulus(lastInd -sig:lastInd), highSide);
 psych = fit_psychometric_curve(xAxis, yData, false);
 plot_single_psychometric_curve(psych, 'k', errorbars)
 ylabel('Proportion Lick Right')
@@ -79,7 +80,7 @@ lastInd = find(example_mouse.sessionNum == 22, 1, 'last');
 
 [xAxis, yData, errorbars] = generate_psych_data( ...
     example_mouse.lick(:,lastInd -sig:lastInd), ...
-    example_mouse.stimulus(lastInd -sig:lastInd));
+    example_mouse.stimulus(lastInd -sig:lastInd), highSide);
 psych = fit_psychometric_curve(xAxis, yData, false);
 plot_single_psychometric_curve(psych, 'k', errorbars)
 ylabel('Proportion Lick Right')
@@ -130,8 +131,8 @@ hold on
 for i = 1:length(control)
     t(i) = analyze_training(control(i));
 
-    [d_x, d_y] = get_performance_trajectory(control(i), "easy", 200);
-    plot(d_x, d_y, 'color', [0 0 0 0.5])
+    [d_x, d_y] = get_performance_trajectory(control(i), "easy", 500);
+    plot(d_x(500:end), d_y(500:end), 'color', [0 0 0 0.5])
     hold on
   
         
@@ -181,14 +182,13 @@ for i = 1:length(control)
     choose_training_period = false(length(control(i).stimulus),1);
     choose_training_period(t(i).trials_proficient:end) = true;
     choose_trials = control(i).stimulus < 4 | control(i).stimulus > 16;
-    a = select_trials(control(i),  choose_training_period' & choose_trials)
+    a = select_trials(control(i),  choose_training_period' & choose_trials);
     perf{i} = splitapply(@(x) sum(x([1,2],:), 'all')./sum(x(1:4,:), 'all'), a.lick, a.sessionNum - min(a.sessionNum)+1)
     
 end
 
-p1 = cellfun(@nanmean, perf)
-v1 = cellfun(@var, perf)
-
+p1 = cellfun(@nanmean, perf);
+v1 = cellfun(@var, perf);
 
 
 
@@ -197,16 +197,17 @@ for i = 1:length(control)
     choose_training_period = false(length(control(i).stimulus),1);
     choose_training_period(t(i).trials_expert:end) = true;
     choose_trials = control(i).stimulus >= 4 | control(i).stimulus <= 16;
-    a = select_trials(control(i),  choose_training_period' & choose_trials)
-    perf{i} = splitapply(@(x) sum(x([1,2],:), 'all')./sum(x(1:4,:), 'all'), a.lick, a.sessionNum - min(a.sessionNum)+1)
+    a = select_trials(control(i),  choose_training_period' & choose_trials);
+    perf{i} = splitapply(@(x) sum(x([1,2],:), 'all')./sum(x(1:4,:), 'all'), a.lick, a.sessionNum - min(a.sessionNum)+1);
     
 end
 
-p2 = cellfun(@nanmean, perf)
-v2 = cellfun(@var, perf)
+p2 = cellfun(@nanmean, perf);
+v2 = cellfun(@var, perf);
 
 
 %%
+figure
 subplot(1,2,1)
 errorbar(1, nanmean(p1), sem(p1'), 'ok')
 hold on
@@ -216,7 +217,7 @@ hold on
 scatter(ones(1, length(p2))*2, p2,  'ok', 'MarkerEdgeAlpha', 0.4)
 xlim([0.75 2.25])
 xticks([1 2])
-ylim([0.85 1])
+%ylim([0.85 1])
 xticklabels({'Easy Trials', 'Hard Trials'})
 title('Average Performance Across Sessions')
 axis square

@@ -4,9 +4,9 @@
 % bin the data relative to proficient to determine 'stages' of learning based on LED effect and plot the effect of LED at each stage
 %
 
-num_groups = 1;
+num_groups = 5;
 for i = 1:num_groups
-    group = get_animal_array;
+    [group, an_id] = get_animal_array;
     
     names(i) = inputdlg('Group Name');
     for j = 1:length(group)
@@ -20,6 +20,7 @@ for i = 1:num_groups
     
     groups{i} = animal;
     training{i} = train;
+    ids{i} = an_id;
     clear animal
     clear train
     
@@ -32,15 +33,28 @@ end
 
 for i = 1:length(groups)
     a = groups{i};
-    sig = 1000;
-    
+    sig = 500;
+    figure
     for j = 1:length(a)
-        figure
+        subplot(length(a),1,j)
         lick = a(j).lick;
         led = a(j).LED;
-        hard = ~(a(j).stimulus <= 16 & a(j).stimulus >= 4);
+        hard = ~(a(j).stimulus <= 16 & a(j).stimulus >= 4);%& a(j).stimulus ~= 8);
         x = 1:length(a(j).LED);
-        highSide = mode(groups{i}(j).target(groups{i}(j).stimulus == 32));
+        highSide = mode(groups{i}(j).target(groups{i}(j).stimulus == 32));  
+        
+        lefts = sum(movsum(lick([2,3],logical(~led & hard))',[sig, 0])');
+        rights = sum(movsum(lick([1,4],logical(~led & hard))',[sig, 0])');
+        totals = sum(movsum(lick([1:4],logical(~led & hard))',[sig, 0])');
+        if highSide == 1
+            bias2 = (lefts - rights)./totals;
+        else
+            bias2 = (rights - lefts)./totals;
+        end
+        
+        plot(x(logical(~led & hard)), bias2);
+        hold on
+        
         lefts = sum(movsum(lick([2,3],logical(led & hard))',[sig, 0])');
         rights = sum(movsum(lick([1,4],logical(led & hard))',[sig, 0])');
         totals = sum(movsum(lick([1:4],logical(led & hard))',[sig, 0])');
@@ -53,26 +67,27 @@ for i = 1:length(groups)
         plot(x(logical(led & hard)), bias);
         hold on
         
-        lefts = sum(movsum(lick([2,3],logical(~led & hard))',[sig, 0])');
-        rights = sum(movsum(lick([1,4],logical(~led & hard))',[sig, 0])');
-        totals = sum(movsum(lick([1:4],logical(~led & hard))',[sig, 0])');
-         if highSide == 1
-            bias2 = (lefts - rights)./totals;
-        else
-            bias2 = (rights - lefts)./totals;
-         end
-        
-        plot(x(logical(~led & hard)), bias2);
+      
         hold on
-        
+        [x,y] = (get_performance_trajectory(a(j), 'eight', sig, 'right',a(j).LED));
+        if highSide == 1
+            %plot(x,-y)
+        else
+            %plot(x, y)
+        end
         %first_psych = splitapply(@(x) sum(x == 8), a(j).stimulus, a(j).sessionNum - min(a(j).sessionNum)+1)
         %session = find(first_psych > 15, 1, 'first') + min(a(j).sessionNum) - 1;
         %p = find(a(j).sessionNum == session ,1, 'first')
         %p = training{i}(j).trials_expert
         %xline(p)
         yline(0, ':')
+        xlim([sig,x(end)])
+        ylim([-1 1])
+        ylabel('Bias')
+        xlabel('Trials')
     end
 end
+set(gcf,'renderer','painter','color',[1 1 1]);
 
 %%
 
@@ -81,7 +96,8 @@ for i = 1:length(groups)
    
     
     for j = 1:length(groups{i})
-        bins = generate_bins(length(groups{i}(j).stimulus), 1000);
+       bins = generate_bins(length(groups{i}(j).stimulus), 100);
+       %bins = groups{i}(j).sessionNum;
        prof_bin(i,j) = bins(training{i}(j).trials_proficient);
         
 %         first_psych = splitapply(@(x) sum(x == 8), groups{i}(j).stimulus,  groups{i}(j).sessionNum - min( groups{i}(j).sessionNum)+1)
@@ -107,10 +123,11 @@ for i = 1:length(prof_bin)
     bb = b{i};
     bin = prof_bin(i);
     
-    group_bias(i,:,:) = bb(bin - 1:bin+1,:)
+    group_bias(i,:,:) = bb(bin - 5:bin+5,:)
 end
 
-    
+%%
+
 
 
 

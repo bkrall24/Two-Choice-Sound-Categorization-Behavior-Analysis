@@ -36,8 +36,9 @@ function curves = plot_psychometric_curves(name, bins, conditions)
         nexttile
         for j = 1:length(conds)
             
-            trial_choice = (bins == b(i)) & conditions == conds(j);            
-            [xAxis, yData, ~] = generate_psych_data(name.lick(:, trial_choice), name.stimulus(trial_choice));
+            trial_choice = (bins == b(i)) & conditions == conds(j);
+            highSide = mode(name.target(name.stimulus == 2));
+            [xAxis, yData, ~] = generate_psych_data(name.lick(:, trial_choice), name.stimulus(trial_choice), highSide);
             
             if sum(~isnan(yData)) > 3
                 psych = fit_psychometric_curve(xAxis(~isnan(yData)), yData(~isnan(yData)), true, colors(j,:));
