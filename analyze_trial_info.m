@@ -33,6 +33,7 @@ function trial_info = analyze_trial_info(selpath)
     % determine how many possible sessions exist and making a list of those
     % filenames
     sessionFolders = dir(selpath);
+    
     filenames = extractfield(sessionFolders, 'name');
     filenames = filenames(contains(filenames, 'Session'));
   
@@ -41,7 +42,7 @@ function trial_info = analyze_trial_info(selpath)
     % them based on the session number to ensure you're keeping things
     % chronological
     sessionNum = cellfun(@str2num, (regexp(cell2mat(filenames), '\d*', 'Match')));
-    [~,sortIdx] = sort(sessionNum,'ascend');
+    [sessionNum,sortIdx] = sort(sessionNum,'ascend');
     filenames = filenames(sortIdx);
     
     %Determines which of those folders to analyze by comparing the list

@@ -20,7 +20,14 @@ function trials = select_trials(name, varargin)
 
     elseif isa(select, 'double')
 
-        choose = ismember(name.sessionNum, select);
+       % choose = ismember(name.sessionNum, select);
+       try
+        choose = false(1,length(name.sessionNum));
+       catch
+           choose = false(1, length(name.sessions))
+       end
+       choose(select) = true;
+       %choose = logical(choose)
 
     elseif isequal(select, 'operant')
 

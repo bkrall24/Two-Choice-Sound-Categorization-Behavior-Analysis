@@ -16,10 +16,7 @@ function session =  analyze_session(selpath)
     %       trials in that session. Each index provides the relevant 
     %       information for  a given trial
     %      
-    %   lickInfo - n x 5 boolean matrix where n = number of trials and each
-    %       column corresponds to a possible choice: Right Hit, Left Hit,
-    %       Right Miss, Left Miss, or No Go. 
-         
+    %   
 
     
     if nargin == 0
