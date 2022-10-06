@@ -76,7 +76,7 @@ function plot_training_progress(name, sig, LED)
         text(50, 830, 'Hard', 'color', 'r', 'HorizontalAlignment', 'left')
         text(50, 860, 'All', 'color', 'k', 'HorizontalAlignment', 'left')
         plot(diff(name.sessionNum)*1000, ':', 'color', [0.5 0.5 0.5])
-        ylim([700 max(all_rxn(sig:end))+10])
+        %ylim([700 max(all_rxn(sig:end))+10])
 
 
 
@@ -98,7 +98,7 @@ function plot_training_progress(name, sig, LED)
         text(50, 800, 'Low', 'color', 'b', 'HorizontalAlignment', 'left')
         text(50, 830, 'High', 'color', 'r', 'HorizontalAlignment', 'left')
         plot(diff(name.sessionNum)*1000, ':', 'color', [0.5 0.5 0.5])
-        ylim([700 max(all_rxn(sig:end))+10])
+        %ylim([700 max(all_rxn(sig:end))+10])
     else
         for i = 1:2
             figure
@@ -183,7 +183,7 @@ function plot_training_progress(name, sig, LED)
             text(50, 830, 'Hard', 'color', 'r', 'HorizontalAlignment', 'left')
             text(50, 860, 'All', 'color', 'k', 'HorizontalAlignment', 'left')
             plot(diff(name.sessionNum)*max(all_rxn(sig2:end))+10, ':', 'color', [0.5 0.5 0.5])
-            ylim([700 max(all_rxn(sig2:end))+10])
+            %ylim([700 round(max(all_rxn(sig2:end))+10)])
 
 
 
@@ -205,7 +205,7 @@ function plot_training_progress(name, sig, LED)
             text(50, 800, 'Low', 'color', 'b', 'HorizontalAlignment', 'left')
             text(50, 830, 'High', 'color', 'r', 'HorizontalAlignment', 'left')
             plot(diff(name.sessionNum)*max(all_rxn(sig2:end))+10, ':', 'color', [0.5 0.5 0.5])
-            ylim([700 max(all_rxn(sig2:end))+10])
+            %ylim([700 max(all_rxn(sig2:end))+10])
                                                
             
             

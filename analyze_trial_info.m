@@ -1,7 +1,11 @@
-function trial_info = analyze_trial_info(selpath)
+function trial_info = analyze_trial_info(c, selpath)
 
     if nargin == 0
         
+        startPath = 'W:\Data\2AFC_Behavior';
+        selpath = uigetdir(startPath);
+        c = false;
+    elseif nargin == 1
         startPath = 'W:\Data\2AFC_Behavior';
         selpath = uigetdir(startPath);
     end
@@ -9,8 +13,11 @@ function trial_info = analyze_trial_info(selpath)
     
     %Make a new filename using the name of the directory you select
     f = split(selpath, ["\"]);
-    filepath = [selpath,'\','ttl_info_',f{end},'.mat'];
-    
+    if c
+        filepath = [selpath,'\','ttl_choices_',f{end},'.mat'];
+    else
+        filepath = [selpath,'\','ttl_info_',f{end},'.mat'];
+    end
     %Checks to see if file was already generated, if so, it loads the
     %data as well as identifying which sessions have already been
     %analyzed. If not, it initalizes the variables to be saved. 
@@ -20,11 +27,17 @@ function trial_info = analyze_trial_info(selpath)
         disp(strcat("Loading data from ", filepath));
     else
         loadedSessions = 'nan';
-              
-        trial_info.lick = [];
-        trial_info.h2o = [];
-        trial_info.sessions = [];
-        trial_info.good_trials = [];
+       
+        if c 
+            trial_info.choice = [];
+            trial_info.sessions = [];
+            trial_info.good_trials = [];
+        else
+            trial_info.lick = [];
+            trial_info.h2o = [];
+            trial_info.sessions = [];
+            trial_info.good_trials = [];
+        end
          
         disp(strcat("No file exists, creating file ",filepath));
     end
@@ -54,20 +67,29 @@ function trial_info = analyze_trial_info(selpath)
     end
     
     
- 
+    
     for currentDay = 1:length(extractSessions)
-       
-        inputPath = [selpath, '\', extractSessions{currentDay}];
-        t = analyze_session_trial_info(inputPath);
         
-        trial_info.sessions = [trial_info.sessions, t.sessions];
-        l = cat(3, t.lick1, t.lick2);
-        trial_info.lick = cat(1, trial_info.lick, l);
-        h = cat(3, t.h2o1, t.h2o2);
-        trial_info.h2o = cat(1, trial_info.h2o, h);
-        trial_info.good_trials = [trial_info.good_trials, t.good_trials];
+        inputPath = [selpath, '\', extractSessions{currentDay}];
+        if c
+            t = analyze_session_trial_choice(inputPath);
+            trial_info.sessions = [trial_info.sessions, t.sessions];
+            trial_info.good_trials = [trial_info.good_trials, t.good_trials];
+            trial_info.choice =  cat(1, trial_info.choice, t.choice);
+        else
+            t = analyze_session_trial_info(inputPath);
+            
+            trial_info.sessions = [trial_info.sessions, t.sessions];
+            l = cat(3, t.lick1, t.lick2);
+            trial_info.lick = cat(1, trial_info.lick, l);
+            h = cat(3, t.h2o1, t.h2o2);
+            trial_info.h2o = cat(1, trial_info.h2o, h);
+            trial_info.good_trials = [trial_info.good_trials, t.good_trials];
+        end
+        
+        
     end
-   
+    
     if ~isempty(extractSessions)
         save(filepath, 'trial_info');
     end
