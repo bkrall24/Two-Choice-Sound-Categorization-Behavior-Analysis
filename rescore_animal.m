@@ -20,7 +20,7 @@ function [choice, rxn] = rescore_animal(ttl,response_period)
         end
         
         if ~isempty(rx)
-            rxn(i) = rx *2 + (response_period(1) - 750);
+            rxn(i) = rx * 2 + (response_period(1) - 750);
         else
             rxn(i) =  -1;
         end

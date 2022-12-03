@@ -84,6 +84,9 @@ function tInfo = analyze_session_trial_info(selpath)
             if ~isempty(relativeTiming)
                
                 remove_ind = (diff(relativeTiming) > 0);
+                [v, w] = unique( relativeTiming(remove_ind), 'stable' );
+                duplicate_indices = setdiff( 1:numel(relativeTiming(remove_ind)), w );
+                remove_ind(duplicate_indices)= 0;
                 
 
                 % Resample the data such that you pull out 1 second
@@ -96,22 +99,32 @@ function tInfo = analyze_session_trial_info(selpath)
                 % be some minor minor data loss where one sample (1/500
                 % of a second) has the wrong value.
                 resample = [-1:1/500:3];
-                lick1 = interp1(relativeTiming(remove_ind), s.Lickometer_1(remove_ind), resample);
-                lick1(isnan(lick1)) = 0;
-                lick2 = interp1(relativeTiming(remove_ind), s.Lickometer_2(remove_ind), resample);
-                lick2(isnan(lick2)) = 0;
-                h2o1 = interp1(relativeTiming(remove_ind), s.H2O(remove_ind), resample);
-                h2o1(isnan(h2o1)) = 0;
-                h2o2 = interp1(relativeTiming(remove_ind), s.H2O2(remove_ind), resample);
-                h2o2(isnan(h2o2)) = 0;
+                try
+                    lick1 = interp1(relativeTiming(remove_ind), s.Lickometer_1(remove_ind), resample);
+                
+                    lick1(isnan(lick1)) = 0;
+                    lick2 = interp1(relativeTiming(remove_ind), s.Lickometer_2(remove_ind), resample);
+                    lick2(isnan(lick2)) = 0;
+                    h2o1 = interp1(relativeTiming(remove_ind), s.H2O(remove_ind), resample);
+                    h2o1(isnan(h2o1)) = 0;
+                    h2o2 = interp1(relativeTiming(remove_ind), s.H2O2(remove_ind), resample);
+                    h2o2(isnan(h2o2)) = 0;
 
 
-                tInfo.h2o1 = [tInfo.h2o1; logical(h2o1)];
-                tInfo.h2o2 = [tInfo.h2o2; logical(h2o2)];
-                tInfo.lick1 = [tInfo.lick1; logical(lick1)];
-                tInfo.lick2 = [tInfo.lick2; logical(lick2)];
-                tInfo.sessions = [tInfo.sessions, str2num(f{end})];
-                tInfo.good_trials = [tInfo.good_trials, true];
+                    tInfo.h2o1 = [tInfo.h2o1; logical(h2o1)];
+                    tInfo.h2o2 = [tInfo.h2o2; logical(h2o2)];
+                    tInfo.lick1 = [tInfo.lick1; logical(lick1)];
+                    tInfo.lick2 = [tInfo.lick2; logical(lick2)];
+                    tInfo.sessions = [tInfo.sessions, str2num(f{end})];
+                    tInfo.good_trials = [tInfo.good_trials, true];
+                catch
+                    tInfo.h2o1 = [tInfo.h2o1; false(1, 2001)];
+                    tInfo.h2o2 = [tInfo.h2o2; false(1, 2001)];
+                    tInfo.lick1 = [tInfo.lick1; false(1, 2001)];
+                    tInfo.lick2 = [tInfo.lick2; false(1, 2001)];
+                    tInfo.sessions = [tInfo.sessions, str2num(f{end})];
+                    tInfo.good_trials = [tInfo.good_trials, false];
+                end
             else
                 tInfo.h2o1 = [tInfo.h2o1; false(1, 2001)];
                 tInfo.h2o2 = [tInfo.h2o2; false(1, 2001)];

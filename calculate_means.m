@@ -9,10 +9,12 @@ function [percents, ids] = calculate_means(data, stimulus, stimulus_choice)
         stimulus_choice = 'all';
     end      
             
-
-    [groups, ids] = findgroups(stimulus);    
-    stimulus_chunks = splitapply(@(x) {[x]}, data, groups);
-    
+    try
+        [groups, ids] = findgroups(stimulus);    
+        stimulus_chunks = splitapply(@(x) {[x]}, data, groups);
+    catch
+        stimulus_chunks = [];
+    end
     
     % I'm going to hard code this for the AM frequencies
     if stimulus_choice == "all"

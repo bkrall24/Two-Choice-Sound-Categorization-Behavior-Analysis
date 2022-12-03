@@ -47,6 +47,7 @@ function curves = plot_psychometric_curves(name, bins, conditions)
                       
             
         end
+        title(i)
     end
     
     

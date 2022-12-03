@@ -1,4 +1,4 @@
-function trials = select_trials(name, varargin)
+function [trials, choose] = select_trials(name, varargin)
 
     % The idea for this function is to have a single function that takes a
     % structure from analyzeAnimal and pulls out the relevant data based on
@@ -24,7 +24,7 @@ function trials = select_trials(name, varargin)
        try
         choose = false(1,length(name.sessionNum));
        catch
-           choose = false(1, length(name.sessions))
+           choose = false(1, length(name.session));
        end
        choose(select) = true;
        %choose = logical(choose)
@@ -39,7 +39,7 @@ function trials = select_trials(name, varargin)
 
         op = contains(name.parameter, 'dualspout_op');
         psy = contains(name.parameter, 'psych');
-        psy_counts = splitapply(@sum, psy, name.sessionNum);
+        psy_counts = splitapply(@sum, psy, findgroups(name.sessionNum));
 
         if which_op == "days"
             last_day_op = find(psy_counts > 100, 1, 'first')-1;
@@ -58,7 +58,7 @@ function trials = select_trials(name, varargin)
 
         op = contains(name.parameter, 'dualspout_op');
         psy = contains(name.parameter, 'psych');
-        psy_counts = splitapply(@sum, psy, name.sessionNum);
+        psy_counts = splitapply(@sum, psy, findgroups(name.sessionNum));
 
         if which_psy == "days"
             first_day_psy = find(psy_counts > 100, 1, 'first');
@@ -66,7 +66,24 @@ function trials = select_trials(name, varargin)
         else
             choose = psy;
         end
+        
+    elseif isequal(select, 'opto')
+         if length(varargin) > 1
+            which_psy = varargin{2};
+        else
+            which_psy = "trials";
+        end
 
+        opto = contains(name.parameter, 'OPTO');
+        
+       	opto_counts = splitapply(@sum, opto, findgroups(name.sessionNum));
+
+        if which_psy == "days"
+            first_day_psy = find(opto_counts > 20, 1, 'first');
+            choose = ismember(name.sessionNum, first_day_psy:max(name.sessionNum));
+        else
+            choose = opto;
+        end
     end
 
 

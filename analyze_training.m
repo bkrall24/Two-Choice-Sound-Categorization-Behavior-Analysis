@@ -51,7 +51,7 @@ function training = analyze_training(name, save_choice)
     training.trials_proficient = get_trial_number_at_threshold(name, 0.85, dualspout & easy & ~(name.LED));
     training.days_proficient = name.sessionNum(training.trials_proficient);
     
-    % This is a new expert threshold. Its when the animal passes 85% on all
+    % This is a new expert threshold. Its when the animal passes 75% on all
     % hard, discriminable trials (i.e. not easy and not category boundary)
     training.trials_expert = get_trial_number_at_threshold(name, 0.75, dualspout & ~(name.LED) & discrim & ~easy);
     training.days_expert = name.sessionNum(training.trials_expert);

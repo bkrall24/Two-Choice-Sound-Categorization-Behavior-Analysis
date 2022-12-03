@@ -42,10 +42,14 @@ function [percents, ids] = calculate_percentages(lick, stimulus, stimulus_choice
         denom = [1:5];
     end
     
-    
-    [groups, ids] = findgroups(stimulus);
-    numerator = splitapply(@(x) sum(x(num,:), 'all'), lick, groups);
-    denominator = splitapply(@(x) sum(x(denom,:), 'all'), lick, groups);
+    try
+        [groups, ids] = findgroups(stimulus);
+        numerator = splitapply(@(x) sum(x(num,:), 'all'), lick, groups);
+        denominator = splitapply(@(x) sum(x(denom,:), 'all'), lick, groups);
+    catch
+        numerator = []
+        denominator = [];
+    end
     
     
     % I'm going to hard code this for the AM frequencies
